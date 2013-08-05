@@ -1,0 +1,63 @@
+#This is a basic spider 
+#To Run this, enter the search feild with the name of the hotel and place
+#For example if want to get the website for mgm hotel, las vegas, enter 'MGM+hotel+las+vegas'
+#presently, due to different website layouts, I am not able to generalize the spider, but maybe, I will now hold on to 
+#one site, preferably hotels.com, for getting the list of hotels in a city.
+
+
+import urllib2
+import simplejson
+
+url1='https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q='
+search='MGM+hotel+las+vegas'
+place='hotels'
+url2='&userip=USERS-IP-ADDRESS'
+
+#url=(url1+search+'%20'+place+url2)
+url=(url1+search+url2)
+
+
+request = urllib2.Request(url, None, {'Referer': 'http://www.google.co.in'})
+response = urllib2.urlopen(request)
+
+results = simplejson.load(response)
+
+
+site= results['responseData']['results'][0]['url']
+
+
+import urllib
+import re
+
+def print_html(pagee,data):
+        start=pagee.find('>')
+        end=pagee.find('<')
+        if start == -1:
+            exit
+        data.append(pagee[start+1:end])
+        return end,data
+
+def print_all_html(page,data):
+    pos2=-1
+    d=1
+    while d:
+        page=page[pos2+1:]
+        pos = page.find('<')
+        if pos == -1:
+            return data
+            exit
+        pos2,data=print_html(page[pos2+1:],data)
+    
+    
+data=[]
+dataa=urllib.urlopen(site)
+page=dataa.read()
+pos1=0
+data=print_all_html(page,data)
+data=" ".join(data)
+print site
+ind=data.find('TEL')
+if ind != -1:
+  print 'tel no is:'
+print data[ind:ind+30]
+
